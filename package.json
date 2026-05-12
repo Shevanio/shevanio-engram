@@ -44,6 +44,10 @@
     "README.md",
     "package.json"
   ],
+  "publishConfig": {
+    "provenance": true,
+    "access": "public"
+  },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "*",
     "pi-mcp-adapter": ">=2.5.0"
