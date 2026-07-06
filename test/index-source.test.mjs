@@ -50,6 +50,12 @@ test("mem_session_summary accepts explicit project fallback", () => {
   assert.match(source, /case "mem_session_summary":[\s\S]*if \(!requestedProject\) requireResolvedProject\(\);[\s\S]*ensureSession\(activeSessionId, activeProject\)[\s\S]*project: activeProject/);
 });
 
+test("mem_search exposes and forwards match_mode and all_projects", () => {
+  assert.match(source, /mem_search: Type\.Object\(\{[\s\S]*all_projects: optionalBoolean\("Search across every project; when true project is ignored"\)/);
+  assert.match(source, /mem_search: Type\.Object\(\{[\s\S]*match_mode: optionalString\("Match mode: all \(default\) or any for broader recall"\)/);
+  assert.match(source, /case "mem_search":[\s\S]*project: params\.all_projects \? undefined : params\.project[\s\S]*match_mode: params\.match_mode[\s\S]*all_projects: params\.all_projects/);
+});
+
 test("project detection 404 falls back to local config or diagnostic", () => {
   assert.match(source, /function detectLocalConfigProject\(cwd: string\)/);
   assert.match(source, /project_name/);

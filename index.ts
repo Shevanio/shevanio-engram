@@ -425,6 +425,8 @@ const MEMORY_TOOL_SCHEMAS: Record<string, ReturnType<typeof Type.Object>> = {
     project: optionalString("Filter by project name"),
     scope: optionalString("Filter by scope: project or personal"),
     limit: optionalNumber("Max results"),
+    all_projects: optionalBoolean("Search across every project; when true project is ignored"),
+    match_mode: optionalString("Match mode: all (default) or any for broader recall"),
   }),
   mem_save: Type.Object({
     title: Type.String({ description: "Short, searchable title" }),
@@ -561,7 +563,15 @@ async function callMemoryTool(toolName: string, params: Record<string, unknown>,
 
   switch (toolName) {
     case "mem_search":
-      return engramFetch(`/search${queryString({ q: params.query, type: params.type, project: params.project, scope: params.scope, limit: params.limit })}`);
+      return engramFetch(`/search${queryString({
+        q: params.query,
+        type: params.type,
+        project: params.all_projects ? undefined : params.project,
+        scope: params.scope,
+        limit: params.limit,
+        match_mode: params.match_mode,
+        all_projects: params.all_projects,
+      })}`);
     case "mem_context":
       if (!params.project) requireResolvedProject();
       return engramFetch(`/context${queryString({ project: params.project || project, scope: params.scope })}`);
