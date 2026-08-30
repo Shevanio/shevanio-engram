@@ -5,7 +5,6 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/shevanio-engram"><img alt="npm" src="https://img.shields.io/npm/v/shevanio-engram?color=blue" /></a>
   <a href="https://github.com/Shevanio/shevanio-engram"><img alt="GitHub stars" src="https://img.shields.io/github/stars/Shevanio/shevanio-engram?style=flat&color=yellow" /></a>
   <a href="https://github.com/Shevanio/shevanio-engram/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/Shevanio/shevanio-engram?color=brightgreen" /></a>
   <a href="https://github.com/Shevanio/shevanio-engram/actions"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/Shevanio/shevanio-engram/ci.yml?label=CI" /></a>
@@ -30,15 +29,15 @@ Engram is persistent memory for AI coding agents. `shevanio-engram` connects Pi 
 
 ## The promise
 
-Install it once. Keep coding. Pi remembers.
+After an npm release is independently verified, install it once. Keep coding. Pi remembers.
 
 - **One brain for many agents** — Pi, Claude Code, OpenCode, Gemini CLI, Codex, VS Code/Copilot, Cursor, Windsurf, Antigravity, and any MCP-compatible agent can read/write the same Engram memory.
 - **Local-first memory** — a single Go binary writes to SQLite + FTS5 on your machine. No Node service, Python stack, or hosted account required for the core path.
 - **Cloud when the team needs it** — Engram Cloud adds opt-in, project-scoped replication, shared access, and a browser dashboard while keeping local SQLite authoritative.
 - **Token-efficient by design** — Engram stores curated summaries, decisions, prompts, and session handoffs instead of a noisy firehose of raw tool calls. Agents search first, then fetch only the relevant memory.
 - **Compaction survival** — before context resets, the Memory Protocol pushes summaries into Engram so the next session can recover what matters.
-- **Simple Pi setup** — install the Pi package, install the MCP adapter, run `pi-engram init`, restart Pi.
-- **Real open-source project** — Engram ships docs, releases, beta programs, contributor guidelines, issue templates, CI, and a growing contributor/community workflow around the main repository.
+- **Bounded Pi setup** — after publication is verified, install through Pi, invoke `pi-engram` from Pi's managed npm prefix, and restart Pi.
+- **Open-source repository** — this repository currently contains source, automated tests, CI, package metadata, and package usage documentation.
 
 ## Why this is different from “more context”
 
@@ -57,15 +56,23 @@ Engram does not try to make the model read everything. It gives the model a disc
 
 Engram includes a terminal UI for browsing sessions, observations, prompts, projects, timelines, and search results. Engram Cloud adds browser visibility for shared project memory.
 
-## Quick start
+## Quick start after publication
+
+`shevanio-engram` is the canonical npm identity, but this README does not claim that a release currently exists. Use the npm installation commands only after an unauthenticated registry check confirms the intended version:
+
+```bash
+npm view shevanio-engram@0.1.10 version
+```
+
+After that verification succeeds:
 
 ```bash
 pi install npm:shevanio-engram@0.1.10
 pi install npm:pi-mcp-adapter
-pi-engram init
+"${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}/npm/node_modules/.bin/pi-engram" init
 ```
 
-Restart Pi after installation, then ask Pi what it remembers about the current project or call `mem_context`.
+Pi-managed installs do not add the package's `.bin` directory to the shell `PATH`, which is why the command uses the managed prefix explicitly. Restart Pi after installation, then ask Pi what it remembers about the current project or call `mem_context`.
 
 ## What gets installed
 
@@ -188,7 +195,13 @@ If the binary is missing, Pi keeps running and memory degrades instead of crashi
 
 ## Install command details
 
-`pi-engram init` writes Pi-owned config in the Pi agent directory:
+For a Pi-managed installation, invoke the executable through Pi's managed npm prefix:
+
+```bash
+"${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}/npm/node_modules/.bin/pi-engram" init
+```
+
+The `init` subcommand writes Pi-owned config in the Pi agent directory:
 
 - `settings.json`: ensures `npm:pi-mcp-adapter` and `npm:shevanio-engram@0.1.10` are declared.
 - `mcp.json`: adds an `engram` MCP server that launches `engram mcp --tools=agent` through a safe Node wrapper with `directTools: false`, so MCP remains available through the gateway without duplicating Pi-native `mem_*` tools.
@@ -198,7 +211,7 @@ If the binary is missing, Pi keeps running and memory degrades instead of crashi
 Existing `mcpServers.engram` entries are preserved unless you pass `--force`:
 
 ```bash
-pi-engram init --force
+"${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}/npm/node_modules/.bin/pi-engram" init --force
 ```
 
 The command respects `PI_CODING_AGENT_DIR`; otherwise it writes to `~/.pi/agent`.
@@ -227,11 +240,11 @@ MCP tool calls still use Engram core's canonical project resolver at call time. 
 
 | Symptom                                                      | Fix                                                                                                                                                                                                                                                                     |
 | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `mem_*` tools are missing                                    | Install/verify `npm:shevanio-engram@0.1.10`, run `pi-engram init`, then restart Pi. Keep `npm:pi-mcp-adapter` installed if you use MCP integrations such as Notion or direct MCP flows.                                                                                  |
+| `mem_*` tools are missing                                    | After registry publication is verified, install `npm:shevanio-engram@0.1.10`, run `"${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}/npm/node_modules/.bin/pi-engram" init`, then restart Pi. Keep `npm:pi-mcp-adapter` installed if you use MCP integrations such as Notion or direct MCP flows.                                            |
 | Pi cannot find `engram`                                      | Set `ENGRAM_BIN=/absolute/path/to/engram`.                                                                                                                                                                                                                              |
 | Session capture should use another server                    | Set `ENGRAM_URL=http://host:7437`.                                                                                                                                                                                                                                      |
 | Pi shows `error MCP: 0/N servers` but `mem_*` works          | That status is Pi's global MCP gateway, not proof that Engram's Pi-native HTTP tools failed. Check `~/.pi/agent/mcp.json` for stale/unreachable servers such as remote OAuth services, and keep `npm:pi-mcp-adapter` installed if you use MCP integrations like Notion. |
-| Existing MCP config was not replaced                         | Run `pi-engram init --force`.                                                                                                                                                                                                                                           |
+| Existing MCP config was not replaced                         | Run `"${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}/npm/node_modules/.bin/pi-engram" init --force`.                                                                                                                                                                           |
 | `mem_current_project` reports `/project/current` unsupported | Restart or upgrade the running `engram serve`; check `ENGRAM_URL`/`ENGRAM_BIN`. If `.engram/config.json` exists, Pi uses it as a temporary fallback.                                                                                                                    |
 | `mem_session_summary` cannot detect a project                | Ask the user which project should receive the summary, then retry `mem_session_summary` with `project: "name"`.                                                                                                                                                         |
 | Status bar shows `🧠 repos · ambiguous project`             | Pi was started from a parent directory that contains multiple git repos. Run Pi from inside a single repo, or add `.engram/config.json` with `"project_name": "my-project"` to the ambiguous directory.                                                                 |
