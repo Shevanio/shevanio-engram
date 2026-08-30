@@ -41,7 +41,7 @@ export const Type = new Proxy({}, { get: (_target, prop) => schema(String(prop))
 }
 
 test("registered Pi-native mem_search reports native provider transport failure", async () => {
-  const fixtureDir = await mkdtemp(join(tmpdir(), "gentle-engram-native-tool-"));
+  const fixtureDir = await mkdtemp(join(tmpdir(), "engram-native-tool-"));
   const originalFetch = globalThis.fetch;
   const originalUrl = process.env.ENGRAM_URL;
   process.env.ENGRAM_URL = "http://127.0.0.1:17437";
@@ -66,7 +66,7 @@ test("registered Pi-native mem_search reports native provider transport failure"
 
     const result = await memSearch.execute(
       "tool-call-1",
-      { query: "state markers", project: "gentle-agent-state" },
+      { query: "state markers", project: "agent-state" },
       undefined,
       undefined,
       {
@@ -77,7 +77,7 @@ test("registered Pi-native mem_search reports native provider transport failure"
     );
 
     assert.equal(result.isError, true);
-    assert.match(result.content[0].text, /gentle-engram could not reach the Engram HTTP server/);
+    assert.match(result.content[0].text, /shevanio-engram could not reach the Engram HTTP server/);
     assert.match(result.content[0].text, /Pi-native mem_\* tools are registered/);
     assert.match(result.details.error, /native memory provider is not currently responding/);
   } finally {
