@@ -1,0 +1,12 @@
+This repository is derived from the `plugin/pi` subtree of
+https://github.com/Gentleman-Programming/engram.
+
+The imported baseline is npm package `gentle-engram@0.1.10` at source commit
+`31de383c0e67ada28b3766584f711e54f0b0c193`.
+
+The canonical repository and subsequent modifications belong to Shevanio.
+This does not rewrite or replace the original authorship and copyright
+attribution preserved in LICENSE.
+
+Legacy names retained in Git history or migration compatibility record
+provenance and are not current branding.

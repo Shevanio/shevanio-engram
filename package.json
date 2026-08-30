@@ -49,6 +49,8 @@
     "private-redaction.js",
     "test/",
     "README.md",
+    "LICENSE",
+    "NOTICE",
     "package.json"
   ],
   "publishConfig": {
