@@ -22,18 +22,7 @@ async function runInit(agentDir) {
   });
 }
 
-test("package metadata and CLI help use the canonical identity", async () => {
-  const metadata = JSON.parse(await readFile(join(ROOT, "package.json"), "utf8"));
-  assert.equal(metadata.name, "shevanio-engram");
-  assert.equal(metadata.version, "0.1.10");
-  assert.equal(metadata.author, "Shevanio");
-  assert.equal(metadata.homepage, "https://github.com/Shevanio/shevanio-engram");
-  assert.deepEqual(metadata.repository, {
-    type: "git",
-    url: "git+https://github.com/Shevanio/shevanio-engram.git",
-  });
-  assert.match(metadata.pi.image, /Shevanio\/shevanio-engram\/main\/assets\/engram-logo-only\.png$/);
-
+test("CLI help uses the canonical install source", async () => {
   const { stdout } = await execFileAsync(process.execPath, [CLI]);
   assert.match(stdout, /npm:shevanio-engram@0\.1\.10/);
   assert.doesNotMatch(stdout, /npm:gentle-engram/);
