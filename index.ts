@@ -48,7 +48,7 @@ const ENGRAM_TOOL_NAMES = new Set<string>(ENGRAM_TOOLS);
 const MEMORY_INSTRUCTIONS = `## Engram Persistent Memory — Protocol
 
 You have access to Engram, a persistent memory system that survives across sessions and compactions.
-These instructions are injected by gentle-engram, the Pi-native memory provider. Use the memory tools named in this section as the authoritative Pi memory contract. Do not infer alternative Engram tool names from other integrations unless the user explicitly asks you to use them.
+These instructions are injected by shevanio-engram, the Pi-native memory provider. Use the memory tools named in this section as the authoritative Pi memory contract. Do not infer alternative Engram tool names from other integrations unless the user explicitly asks you to use them.
 
 ### WHEN TO SAVE (mandatory — not optional)
 
@@ -719,7 +719,7 @@ async function executeMemoryTool(toolName: string, params: Record<string, unknow
   try {
     const data = await callMemoryTool(toolName, params, ctx);
     if (data === null) {
-      throw new Error(`gentle-engram could not reach the Engram HTTP server at ${ENGRAM_URL}. The Pi-native mem_* tools are registered, but the native memory provider is not currently responding. Run mem_doctor or restart Engram.`);
+      throw new Error(`shevanio-engram could not reach the Engram HTTP server at ${ENGRAM_URL}. The Pi-native mem_* tools are registered, but the native memory provider is not currently responding. Run mem_doctor or restart Engram.`);
     }
     const result = { content: [{ type: "text" as const, text: textResult(data) }], details: { data } };
     if (toolName === "mem_doctor" && data && typeof data === "object" && "status" in data && data.status === "error") {
@@ -744,7 +744,7 @@ function registerMemoryTools(pi: ExtensionAPI): void {
     pi.registerTool({
       name: toolName,
       label: `Engram: ${humanToolName(toolName)}`,
-      description: `Engram memory tool: ${humanToolName(toolName)}. Compact UI is provided by gentle-engram; persistence is handled by Engram when installed and running.`,
+      description: `Engram memory tool: ${humanToolName(toolName)}. Compact UI is provided by shevanio-engram; persistence is handled by Engram when installed and running.`,
       promptSnippet: `Engram memory: ${humanToolName(toolName)}`,
       parameters: MEMORY_TOOL_SCHEMAS[toolName],
       renderShell: "self",

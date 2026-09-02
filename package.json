@@ -1,15 +1,14 @@
 {
-  "name": "gentle-engram",
+  "name": "shevanio-engram",
   "version": "0.1.10",
   "description": "Persistent memory for Pi agents — one local-or-cloud brain shared across sessions, compactions, and MCP agents",
   "type": "module",
   "license": "MIT",
-  "author": "Gentleman Programming",
-  "homepage": "https://github.com/Gentleman-Programming/engram",
+  "author": "Shevanio",
+  "homepage": "https://github.com/Shevanio/shevanio-engram",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Gentleman-Programming/engram.git",
-    "directory": "plugin/pi"
+    "url": "git+https://github.com/Shevanio/shevanio-engram.git"
   },
   "bin": {
     "pi-engram": "cli.js"
@@ -34,7 +33,7 @@
     "extension"
   ],
   "pi": {
-    "image": "https://raw.githubusercontent.com/Gentleman-Programming/engram/main/plugin/pi/assets/engram-logo-only.png",
+    "image": "https://raw.githubusercontent.com/Shevanio/shevanio-engram/main/assets/engram-logo-only.png",
     "extensions": [
       "./index.ts"
     ]
