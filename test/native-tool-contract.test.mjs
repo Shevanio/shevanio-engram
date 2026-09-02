@@ -1,30 +1,39 @@
 import assert from "node:assert/strict";
-import { mkdir, rm, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
-const NODE_MODULES = join(ROOT, "node_modules");
+const FIXTURE_FILES = [
+  "compaction-recovery.js",
+  "index.ts",
+  "memory-tool-chrome.js",
+  "private-redaction.js",
+];
 
-async function installRuntimeStubs() {
-  await mkdir(join(NODE_MODULES, "@earendil-works", "pi-tui"), { recursive: true });
+async function installRuntimeFixture(fixtureDir) {
+  await Promise.all(FIXTURE_FILES.map((file) => copyFile(join(ROOT, file), join(fixtureDir, file))));
+
+  const nodeModules = join(fixtureDir, "node_modules");
+  await mkdir(join(nodeModules, "@earendil-works", "pi-tui"), { recursive: true });
   await writeFile(
-    join(NODE_MODULES, "@earendil-works", "pi-tui", "package.json"),
+    join(nodeModules, "@earendil-works", "pi-tui", "package.json"),
     JSON.stringify({ type: "module", exports: "./index.js" }),
   );
   await writeFile(
-    join(NODE_MODULES, "@earendil-works", "pi-tui", "index.js"),
+    join(nodeModules, "@earendil-works", "pi-tui", "index.js"),
     "export class Text { constructor(text) { this.text = text; } }\n",
   );
 
-  await mkdir(join(NODE_MODULES, "typebox"), { recursive: true });
+  await mkdir(join(nodeModules, "typebox"), { recursive: true });
   await writeFile(
-    join(NODE_MODULES, "typebox", "package.json"),
+    join(nodeModules, "typebox", "package.json"),
     JSON.stringify({ type: "module", exports: "./index.js" }),
   );
   await writeFile(
-    join(NODE_MODULES, "typebox", "index.js"),
+    join(nodeModules, "typebox", "index.js"),
     `const schema = (kind) => (...args) => ({ kind, args });
 export const Type = new Proxy({}, { get: (_target, prop) => schema(String(prop)) });
 `,
@@ -32,6 +41,7 @@ export const Type = new Proxy({}, { get: (_target, prop) => schema(String(prop))
 }
 
 test("registered Pi-native mem_search reports native provider transport failure", async () => {
+  const fixtureDir = await mkdtemp(join(tmpdir(), "gentle-engram-native-tool-"));
   const originalFetch = globalThis.fetch;
   const originalUrl = process.env.ENGRAM_URL;
   process.env.ENGRAM_URL = "http://127.0.0.1:17437";
@@ -40,10 +50,9 @@ test("registered Pi-native mem_search reports native provider transport failure"
   };
 
   try {
-    await installRuntimeStubs();
+    await installRuntimeFixture(fixtureDir);
     const registeredTools = new Map();
-    const pluginUrl = pathToFileURL(join(ROOT, "index.ts"));
-    pluginUrl.search = `?contract=${Date.now()}`;
+    const pluginUrl = pathToFileURL(join(fixtureDir, "index.ts"));
     const { default: registerEngram } = await import(pluginUrl.href);
     registerEngram({
       registerTool(tool) {
@@ -75,6 +84,6 @@ test("registered Pi-native mem_search reports native provider transport failure"
     globalThis.fetch = originalFetch;
     if (originalUrl === undefined) delete process.env.ENGRAM_URL;
     else process.env.ENGRAM_URL = originalUrl;
-    await rm(NODE_MODULES, { recursive: true, force: true });
+    await rm(fixtureDir, { recursive: true, force: true });
   }
 });
