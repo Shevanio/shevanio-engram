@@ -21,7 +21,7 @@ Source: [`.github/workflows/ci.yml`](https://github.com/Shevanio/shevanio-engram
 
 GitHub Actions is enabled, the workflow is active, and the repository's default workflow token permission is read-only. The workflow cannot approve pull requests.
 
-Security reports follow the repository's [security policy](https://github.com/Shevanio/shevanio-engram/security/policy). As of 2026-09-03, Private Vulnerability Reporting is disabled; this documentation change does not enable it.
+Security reports follow the repository's [security policy](https://github.com/Shevanio/shevanio-engram/security/policy). Private Vulnerability Reporting is enabled and operates independently of CI; reports do not change workflow permissions or the required `verify` check.
 
 ## Run the local equivalent
 
