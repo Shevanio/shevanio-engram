@@ -9,6 +9,7 @@ Check exactly one and apply the matching `type:*` label.
 - [ ] New feature (`type:feature`)
 - [ ] Bug fix (`type:bug`)
 - [ ] Documentation only (`type:docs`)
+- [ ] Maintenance/tooling (`type:chore`)
 - [ ] Breaking change (`type:breaking-change`)
 
 ## Summary
@@ -28,7 +29,7 @@ Check exactly one and apply the matching `type:*` label.
 
 ## Review evidence
 
-- Raw A+D: `<additions> + <deletions> = <total>` (must be `<= 400`)
+- Raw A+D: `<additions> + <deletions> = <total>` (must be `<= 400`, or explain the approved `size:exception`)
 - Runtime: `<command or scenario>` — `<result>`
 - Package dry run: `<command>` — `<result>`
 

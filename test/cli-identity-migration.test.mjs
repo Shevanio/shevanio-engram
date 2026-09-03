@@ -22,9 +22,11 @@ async function runInit(agentDir) {
   });
 }
 
-test("CLI help uses the canonical install source", async () => {
+test("CLI help directs unpublished-package users to a local checkout", async () => {
   const { stdout } = await execFileAsync(process.execPath, [CLI]);
-  assert.match(stdout, /npm:shevanio-engram@0\.1\.10/);
+  assert.match(stdout, /canonical npm package is not published/i);
+  assert.match(stdout, /pi install \/absolute\/path\/to\/shevanio-engram/);
+  assert.doesNotMatch(stdout, /pi install npm:shevanio-engram/);
   assert.doesNotMatch(stdout, /npm:gentle-engram/);
 });
 
