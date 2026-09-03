@@ -66,6 +66,19 @@ function isReadmeMigrationCompatibility(source, match) {
     && /never scans or deletes/i.test(paragraph);
 }
 
+function isReadmeDistributionStatus(source, match) {
+  const line = lineContaining(source, match.index);
+  return line.includes("`gentle-engram@0.1.10`")
+    && /Upstream compatibility artifact/i.test(line);
+}
+
+function isReadmeUpstreamSetupBoundary(source, match) {
+  const paragraph = paragraphContaining(source, match.index);
+  return paragraph.includes("`engram setup pi`")
+    && /upstream compatibility/i.test(paragraph)
+    && /Do not use `engram setup pi`/i.test(paragraph);
+}
+
 test("package manifest preserves the downstream Pi consumer surface", async () => {
   const manifest = await readManifest();
 
@@ -80,22 +93,21 @@ test("package manifest preserves the downstream Pi consumer surface", async () =
     url: "git+https://github.com/Shevanio/shevanio-engram.git",
   });
   assert.equal(manifest.homepage, "https://github.com/Shevanio/shevanio-engram");
-  assert.equal(
-    manifest.pi.image,
-    "https://raw.githubusercontent.com/Shevanio/shevanio-engram/main/assets/engram-logo-only.png",
-  );
+  assert.equal("image" in manifest.pi, false);
+  assert.equal(manifest.files.includes("assets/"), false);
 
   const requiredFiles = [
-    "assets/",
     "cli.js",
     "compaction-recovery.js",
     "index.ts",
     "memory-tool-chrome.js",
     "mcp-template.json",
     "private-redaction.js",
+    "docs/ci.md",
     "README.md",
     "LICENSE",
     "NOTICE",
+    "TRADEMARKS.md",
     "package.json",
   ];
   for (const path of requiredFiles) assert.ok(manifest.files.includes(path), `package files must include ${path}`);
@@ -118,12 +130,14 @@ test("package dry-run contains the required consumer files without writing a tar
     "memory-tool-chrome.js",
     "private-redaction.js",
     "mcp-template.json",
-    "assets/engram-logo-only.png",
+    "docs/ci.md",
     "README.md",
     "LICENSE",
     "NOTICE",
+    "TRADEMARKS.md",
   ];
   for (const path of requiredPackedPaths) assert.ok(packedPaths.has(path), `dry-run package must include ${path}`);
+  assert.equal(packedPaths.has("assets/engram-logo-only.png"), false);
 
   const tarballs = (await readdir(ROOT)).filter((path) => path.endsWith(".tgz"));
   assert.deepEqual(tarballs, [], "npm pack --dry-run must not leave a tarball");
@@ -141,7 +155,12 @@ test("package-facing active text contains only bounded legacy identity allowance
     for (const match of legacyIdentityMatches(source)) {
       const isAllowed = path === "cli.js"
         ? isLegacyMigrationConstant(source, match)
-        : path === "README.md" && isReadmeMigrationCompatibility(source, match);
+        : path === "README.md"
+          && (
+            isReadmeDistributionStatus(source, match)
+            || isReadmeMigrationCompatibility(source, match)
+            || isReadmeUpstreamSetupBoundary(source, match)
+          );
       if (isAllowed) {
         allowed.push(`${path}:${match[0]}`);
       } else {
@@ -153,6 +172,9 @@ test("package-facing active text contains only bounded legacy identity allowance
 
   assert.deepEqual(allowed, [
     "cli.js:gentle-engram",
+    "README.md:gentle-engram",
+    "README.md:gentle-engram",
+    "README.md:Gentleman-Programming",
     "README.md:gentle-engram",
   ]);
   assert.deepEqual(unexpected, []);

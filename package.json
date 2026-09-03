@@ -33,13 +33,11 @@
     "extension"
   ],
   "pi": {
-    "image": "https://raw.githubusercontent.com/Shevanio/shevanio-engram/main/assets/engram-logo-only.png",
     "extensions": [
       "./index.ts"
     ]
   },
   "files": [
-    "assets/",
     "cli.js",
     "compaction-recovery.js",
     "index.ts",
@@ -47,9 +45,11 @@
     "mcp-template.json",
     "private-redaction.js",
     "test/",
+    "docs/ci.md",
     "README.md",
     "LICENSE",
     "NOTICE",
+    "TRADEMARKS.md",
     "package.json"
   ],
   "publishConfig": {

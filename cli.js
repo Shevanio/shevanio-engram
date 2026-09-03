@@ -14,8 +14,14 @@ Usage:
   pi-engram init [--force]
 
 Creates Pi's Engram MCP config in the Pi agent dir and ensures pi-mcp-adapter
-is declared in settings.json. The Pi extension itself is loaded by installing
-the package with: pi install npm:shevanio-engram@0.1.10
+is declared in settings.json.
+
+The canonical npm package is not published. For development, install this
+repository as a local Pi package:
+  pi install /absolute/path/to/shevanio-engram
+
+The init command records npm:shevanio-engram@0.1.10 in Pi settings and is
+reserved for a verified canonical npm release. See README.md.
 `;
 
 const MCP_LAUNCHER =

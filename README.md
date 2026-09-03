@@ -1,8 +1,4 @@
-# Engram for Pi
-
-<p align="center">
-  <img width="180" alt="Engram logo" src="https://raw.githubusercontent.com/Shevanio/shevanio-engram/main/assets/engram-logo-only.png" />
-</p>
+# Shevanio Engram for Pi
 
 <p align="center">
   <a href="https://github.com/Shevanio/shevanio-engram"><img alt="GitHub stars" src="https://img.shields.io/github/stars/Shevanio/shevanio-engram?style=flat&color=yellow" /></a>
@@ -11,11 +7,55 @@
   <a href="https://github.com/Shevanio/shevanio-engram/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/Shevanio/shevanio-engram" /></a>
 </p>
 
-**Give every Pi session the same brain — local by default, cloud when you want it, and searchable across agents.**
+`shevanio-engram` is the canonical package and repository identity for Shevanio's downstream Pi memory extension. It connects Pi to an Engram server; it does not ship the Engram Go binary. See [NOTICE](NOTICE) for the imported source baseline and [TRADEMARKS.md](TRADEMARKS.md) for the bounded use of upstream names.
 
-Pi is great at doing the work in front of it. The problem is everything around the work: what the agent learned yesterday, which architecture decision was accepted, why a bug was fixed a certain way, what the user prefers, and what should survive when the context window compacts.
+## Current distribution status
 
-Engram is persistent memory for AI coding agents. `shevanio-engram` connects Pi to that memory so your agent can save the useful parts of a session and retrieve them later — without stuffing raw tool output back into the prompt.
+Registry status was checked without authentication on 2026-09-03.
+
+| npm coordinate | Status | Role |
+| -------------- | ------ | ---- |
+| `shevanio-engram` | **Unpublished** (`npm view` returns `E404`) | Canonical package for this repository |
+| `shevanio-pi` | **Unpublished** (`npm view` returns `E404`) | Canonical companion identity, not built by this repository |
+| `gentle-engram@0.1.10` | Published | Upstream compatibility artifact, not the canonical Shevanio distribution |
+| `gentle-pi@2.3.0` | Published | Upstream compatibility artifact, not the canonical Shevanio distribution |
+
+> Do not run `pi install npm:shevanio-engram@0.1.10`. The canonical coordinate is not available from npm yet.
+
+## Supported source-checkout path
+
+Use a local checkout for development until the canonical package is published:
+
+```bash
+git clone https://github.com/Shevanio/shevanio-engram.git
+cd shevanio-engram
+npm install --ignore-scripts --no-package-lock --no-audit --no-fund
+npm test
+npm pack --dry-run --json --ignore-scripts
+pi install "$PWD"
+```
+
+CI verifies this path with Node.js 22. It also requires a Pi version that supports local package paths and an `engram` binary on `PATH` (or `ENGRAM_BIN` set to its absolute path). Restart Pi after `pi install "$PWD"`.
+
+Do not run `pi-engram init` for the local-checkout path. The current initializer records the reserved `npm:shevanio-engram@0.1.10` source in Pi settings, which cannot resolve before publication.
+
+## Package behavior
+
+| Path | Purpose |
+| ---- | ------- |
+| Pi extension | Captures prompts and session events, injects the memory protocol, and exposes compact Pi-native `mem_*` tools over the Engram HTTP server. |
+| Optional MCP gateway | Uses `pi-mcp-adapter` and `engram mcp --tools=agent` for clients or flows that require MCP directly. |
+
+```text
+Pi events/tools -> shevanio-engram extension -> ENGRAM_URL / engram serve -> SQLite
+Pi MCP tools   -> pi-mcp-adapter -> ENGRAM_BIN / engram mcp -> SQLite
+```
+
+When `ENGRAM_URL` is unset, the extension checks the local server and best-effort starts `engram serve` if needed. MCP remains a separate stdio path and still requires an Engram binary. Direct MCP tools are disabled by default in Pi to avoid duplicate raw `engram_mem_*` rows alongside the Pi-native tools.
+
+## Verification
+
+Run `npm test` for the complete test contract and `npm pack --dry-run --json --ignore-scripts` for the no-publish consumer check. The deployed workflow, exact `verify` job, local equivalent, permissions, branch protection, and no-release boundary are documented in [docs/ci.md](docs/ci.md).
 
 ## At a glance
 
@@ -26,18 +66,6 @@ Engram is persistent memory for AI coding agents. `shevanio-engram` connects Pi 
 | Continuity after compaction | Required session summaries and recovery protocol |
 | One memory across tools     | Shared MCP-backed memory for Pi and other agents |
 | Team/project memory         | Optional Engram Cloud replication and dashboard  |
-
-## The promise
-
-After an npm release is independently verified, install it once. Keep coding. Pi remembers.
-
-- **One brain for many agents** — Pi, Claude Code, OpenCode, Gemini CLI, Codex, VS Code/Copilot, Cursor, Windsurf, Antigravity, and any MCP-compatible agent can read/write the same Engram memory.
-- **Local-first memory** — a single Go binary writes to SQLite + FTS5 on your machine. No Node service, Python stack, or hosted account required for the core path.
-- **Cloud when the team needs it** — Engram Cloud adds opt-in, project-scoped replication, shared access, and a browser dashboard while keeping local SQLite authoritative.
-- **Token-efficient by design** — Engram stores curated summaries, decisions, prompts, and session handoffs instead of a noisy firehose of raw tool calls. Agents search first, then fetch only the relevant memory.
-- **Compaction survival** — before context resets, the Memory Protocol pushes summaries into Engram so the next session can recover what matters.
-- **Bounded Pi setup** — after publication is verified, install through Pi, invoke `pi-engram` from Pi's managed npm prefix, and restart Pi.
-- **Open-source repository** — this repository currently contains source, automated tests, CI, package metadata, and package usage documentation.
 
 ## Why this is different from “more context”
 
@@ -55,38 +83,6 @@ Engram does not try to make the model read everything. It gives the model a disc
 ## See the memory
 
 Engram includes a terminal UI for browsing sessions, observations, prompts, projects, timelines, and search results. Engram Cloud adds browser visibility for shared project memory.
-
-## Quick start after publication
-
-`shevanio-engram` is the canonical npm identity, but this README does not claim that a release currently exists. Use the npm installation commands only after an unauthenticated registry check confirms the intended version:
-
-```bash
-npm view shevanio-engram@0.1.10 version
-```
-
-After that verification succeeds:
-
-```bash
-pi install npm:shevanio-engram@0.1.10
-pi install npm:pi-mcp-adapter
-"${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}/npm/node_modules/.bin/pi-engram" init
-```
-
-Pi-managed installs do not add the package's `.bin` directory to the shell `PATH`, which is why the command uses the managed prefix explicitly. Restart Pi after installation, then ask Pi what it remembers about the current project or call `mem_context`.
-
-## What gets installed
-
-`shevanio-engram` connects Pi to Engram through two complementary paths:
-
-| Path         | Purpose                                                                                                                                |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Pi extension | Captures prompts/session events, injects the Memory Protocol, and exposes compact Pi-native `mem_*` tools over the Engram HTTP server. |
-| MCP tools    | Keeps Engram's MCP surface available through `pi-mcp-adapter` for clients and flows that use MCP directly.                             |
-
-```text
-Pi events/tools -> shevanio-engram extension -> ENGRAM_URL / engram serve -> SQLite
-Pi MCP tools   -> pi-mcp-adapter -> ENGRAM_BIN / engram mcp -> SQLite
-```
 
 Pi-native compact tools use the same HTTP server path as event capture, including project detection, diagnostics, passive capture, lifecycle review, and conflict-judgment tools such as `mem_current_project`, `mem_doctor`, `mem_capture_passive`, `mem_review`, `mem_judge`, and `mem_compare`. MCP tools remain a separate stdio path, so direct MCP usage still needs an Engram binary even when `ENGRAM_URL` points at a remote HTTP server. Engram MCP direct tools are not enabled by default in Pi to avoid duplicate raw `engram_mem_*` tool rows.
 
@@ -193,20 +189,14 @@ ENGRAM_BIN=/path/to/engram pi
 
 If the binary is missing, Pi keeps running and memory degrades instead of crashing with `spawn engram ENOENT`.
 
-## Install command details
+## Setup command boundaries
 
-For a Pi-managed installation, invoke the executable through Pi's managed npm prefix:
+### `pi-engram init`
 
-```bash
-"${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}/npm/node_modules/.bin/pi-engram" init
-```
-
-The `init` subcommand writes Pi-owned config in the Pi agent directory:
+The packaged `pi-engram init` command is reserved for a future verified canonical npm release. It writes Pi-owned config in the Pi agent directory:
 
 - `settings.json`: ensures `npm:pi-mcp-adapter` and `npm:shevanio-engram@0.1.10` are declared.
 - `mcp.json`: adds an `engram` MCP server that launches `engram mcp --tools=agent` through a safe Node wrapper with `directTools: false`, so MCP remains available through the gateway without duplicating Pi-native `mem_*` tools.
-
-`engram setup pi` also auto-pins `npmCommand` in Pi's `settings.json` when [mise](https://mise.jdx.dev/) is detected in `PATH`. It sets `npmCommand` to `["mise", "exec", "node@<version>", "--", "npm"]` so Pi always uses the mise-managed Node version. Existing `npmCommand` values are never overwritten; if mise is not found, this step is a no-op.
 
 Existing `mcpServers.engram` entries are preserved unless you pass `--force`:
 
@@ -217,6 +207,10 @@ Existing `mcpServers.engram` entries are preserved unless you pass `--force`:
 The command respects `PI_CODING_AGENT_DIR`; otherwise it writes to `~/.pi/agent`.
 
 For migration, `pi-engram init` rewrites only exact registered npm sources for `gentle-engram`, with or without a version or tag. It preserves canonical pins, object filters and custom fields, and custom `mcpServers.engram` configuration. It never scans or deletes package caches, local paths, filesystem directories, or similarly named packages.
+
+### Upstream `engram setup pi`
+
+`engram setup pi` belongs to [upstream Engram core](https://github.com/Gentleman-Programming/engram/blob/55ee745a767de52c8a43180fd55fd9c19f880c79/internal/setup/setup.go), not this repository. At upstream commit `55ee745`, it runs `pi install npm:gentle-engram@0.1.11`; that upstream compatibility coordinate is unavailable, while npm reports `0.1.10` as its latest published version. Do not use `engram setup pi` to install canonical Shevanio Engram or this source checkout.
 
 ## Project detection
 
@@ -253,4 +247,5 @@ MCP tool calls still use Engram core's canonical project resolver at call time. 
 
 - Run `engram tui` to inspect stored memories.
 - Use `mem_current_project` to confirm project detection before writing memories.
+- Review the [CI and package verification contract](docs/ci.md).
 - Review the package source and report issues: <https://github.com/Shevanio/shevanio-engram>
