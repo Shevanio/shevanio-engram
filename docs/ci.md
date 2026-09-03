@@ -11,6 +11,8 @@ Source: [`.github/workflows/ci.yml`](https://github.com/Shevanio/shevanio-engram
 | Triggers | Every `pull_request`; pushes to `main` |
 | Required job | `verify` |
 | Runner | `ubuntu-latest` |
+| Checkout action | `actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09` (`v5.1.0`) |
+| Node setup action | `actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444` (`v5.0.0`) |
 | Node.js | 22 |
 | Install | `npm install --ignore-scripts --no-package-lock --no-audit --no-fund` |
 | Tests | `npm test` |
@@ -18,6 +20,8 @@ Source: [`.github/workflows/ci.yml`](https://github.com/Shevanio/shevanio-engram
 | Workflow permissions | `contents: read` only |
 
 GitHub Actions is enabled, the workflow is active, and the repository's default workflow token permission is read-only. The workflow cannot approve pull requests.
+
+Security reports follow the repository's [security policy](https://github.com/Shevanio/shevanio-engram/security/policy). As of 2026-09-03, Private Vulnerability Reporting is disabled; this documentation change does not enable it.
 
 ## Run the local equivalent
 

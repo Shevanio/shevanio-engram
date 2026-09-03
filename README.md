@@ -7,7 +7,7 @@
   <a href="https://github.com/Shevanio/shevanio-engram/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/Shevanio/shevanio-engram" /></a>
 </p>
 
-`shevanio-engram` is the canonical package and repository identity for Shevanio's downstream Pi memory extension. It connects Pi to an Engram server; it does not ship the Engram Go binary. See [NOTICE](NOTICE) for the imported source baseline and [TRADEMARKS.md](TRADEMARKS.md) for the bounded use of upstream names.
+`shevanio-engram` is the canonical package and repository identity for Shevanio's downstream Pi memory extension. It connects Pi to an Engram server; it does not ship the Engram Go binary. See [NOTICE](NOTICE) for the imported source baseline, [TRADEMARKS.md](TRADEMARKS.md) for the bounded use of upstream names, and the [security policy](https://github.com/Shevanio/shevanio-engram/security/policy) for private vulnerability reporting.
 
 ## Current distribution status
 
@@ -248,4 +248,5 @@ MCP tool calls still use Engram core's canonical project resolver at call time. 
 - Run `engram tui` to inspect stored memories.
 - Use `mem_current_project` to confirm project detection before writing memories.
 - Review the [CI and package verification contract](docs/ci.md).
+- Review the [security policy](https://github.com/Shevanio/shevanio-engram/security/policy) before reporting a vulnerability.
 - Review the package source and report issues: <https://github.com/Shevanio/shevanio-engram>
